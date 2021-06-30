@@ -1,4 +1,4 @@
-import React, { Component, useReducer, useCallback, useEffect } from 'react'
+import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
 // interface Param {
@@ -27,49 +27,6 @@ import ReactDOM from 'react-dom'
 //   console.log(param.id);
 // }
 
-const initialState = {
-  params: [],
-  paramValues: [],
-}
-
-const reducer = (state = initialState, action) => {
-  switch (action.type) {
-    case 'CHANGE_PARAM':
-      return {
-        ...state,
-        params: [...state.params, action.payload],
-      }
-    case 'CHANGE_PARAMVALUE':
-      return {
-        ...state,
-        paramValues: [...state.paramValues, action.payload],
-      }
-    default:
-      return state
-  }
-}
-
-const useModel = () => {
-  const [state, dispatch] = useReducer(reducer, initialState)
-  const updateParam = useCallback((param = []) => dispatch({ type: 'CHANGE_PARAM', payload: param }), [])
-  const updateParamValue = useCallback(
-    (paramValue = []) => dispatch({ type: 'CHANGE_PARAMVALUE', payload: paramValue }),
-    []
-  )
-  useEffect(() => {
-    updateParam
-  }, [updateParam])
-
-  useEffect(() => {
-    updateParamValue
-  }, [updateParamValue])
-
-  return {
-    ...state,
-    updateParam,
-    updateParamValue,
-  }
-}
 class Param extends Component {
   state = {
     id: '',
@@ -78,17 +35,23 @@ class Param extends Component {
 
   onParamChange = e => {
     const param = e.target.value
-    this.setState({ param })
+    this.setState(param => ({
+      param: param,
+    }))
+    console.log(this.state.param)
   }
 
   onIdChange = e => {
     const id = e.target.value
     this.setState({ id })
+    console.log(this.state.id)
+  }
+
+  handleState = () => {
+    this.props.getParam(this.state)
   }
 
   render() {
-    updateParam = useModel()
-
     return (
       <div>
         <input type="number" placeholder="enter ID" name="id" value={this.state.id} onChange={this.onIdChange} />
@@ -101,7 +64,7 @@ class Param extends Component {
           onChange={this.onParamChange}
         />
         <label htmlFor="param">Enter Param</label>
-        <button onClick={updateParam(this.state)}>update Param</button>
+        <button onClick={this.handleState}>update Param</button>
       </div>
     )
   }
@@ -109,7 +72,6 @@ class Param extends Component {
 
 class ParamValue extends Component {
   state = {
-    id: '',
     paramValue: '',
   }
 
@@ -118,48 +80,67 @@ class ParamValue extends Component {
     this.setState({ paramValue })
   }
 
-  onIdChange = e => {
-    const id = e.target.value
-    this.setState({ id })
+  handleState = () => {
+    this.props.getParamValue(this.state)
   }
+
   render() {
-    updateParamValue = useModel()
     return (
       <div>
-        <input type="number" placeholder="enter ID" name="id" value={this.state.id} onChange={this.onIdChange} />
-        <label htmlFor="id">Enter ID</label>
         <input type="text" placeholder="enter paramValue" name="paramValue" onChange={this.onParamValueChange} />
         <label htmlFor="paramValue">Enter Param</label>
-        <button onClick={updateParamValue(this.state)}>update ParamValue</button>
+        <button onClick={this.handleState}>update ParamValue</button>
       </div>
     )
   }
 }
 
 class Model extends Component {
-  state = {
-    paramValues: [],
+  renderParamValue = () => {
+    return this.props.paramsValues.map(item => {
+      return <span key={item.id}>{item.value}</span>
+    })
   }
-
-  paramValues = useModel()
-
   render() {
-    return null
+    return <div>{this.renderParamValue}</div>
   }
 }
 
 class ParamEditor extends Component {
-  getModel = (model, params) => {}
+  state = {
+    paramValue: [],
+    param: [],
+  }
 
+  getParam = val => {
+    console.log(val)
+    this.setState((state, val) => ({
+      param: [...state.param, val],
+    }))
+    console.log(this.state)
+  }
+
+  getParamValue = val => {
+    this.setState({
+      paramValue: val,
+    })
+    console.log(this.state)
+  }
   render() {
-    const { model, params } = this.props
-    return <div></div>
+    return (
+      <div>
+        <Param getParam={this.getParam} />
+        <ParamValue getParamValue={this.getParamValue} />
+        {/* {this.props.render(this.state.paramValue)} */}
+      </div>
+    )
   }
 }
 
 class App extends Component {
   render() {
-    return <ParamEditor params={params} model={model} />
+    // return <ParamEditor render={paramsValues => <Model paramsValues={paramsValues} />} />
+    return <ParamEditor />
   }
 }
 ReactDOM.render(<App />, document.getElementById('root'))
