@@ -35,16 +35,14 @@ class Param extends Component {
 
   onParamChange = e => {
     const param = e.target.value
-    this.setState(param => ({
-      param: param,
-    }))
-    console.log(this.state.param)
+    this.setState({ param })
+    //console.log(this.state.param)
   }
 
   onIdChange = e => {
     const id = e.target.value
     this.setState({ id })
-    console.log(this.state.id)
+    //console.log(this.state.id)
   }
 
   handleState = () => {
@@ -102,7 +100,7 @@ class Model extends Component {
     })
   }
   render() {
-    return <div>{this.renderParamValue}</div>
+    return <div>{this.renderParamValue(this.props.paramsValues)}</div>
   }
 }
 
@@ -113,7 +111,7 @@ class ParamEditor extends Component {
   }
 
   getParam = val => {
-    console.log(val)
+    debugger
     this.setState((state, val) => ({
       param: [...state.param, val],
     }))
@@ -124,14 +122,14 @@ class ParamEditor extends Component {
     this.setState({
       paramValue: val,
     })
-    console.log(this.state)
+    //console.log(this.state)
   }
   render() {
     return (
       <div>
         <Param getParam={this.getParam} />
         <ParamValue getParamValue={this.getParamValue} />
-        {/* {this.props.render(this.state.paramValue)} */}
+        {this.props.render(this.state.paramValue)}
       </div>
     )
   }
@@ -139,8 +137,8 @@ class ParamEditor extends Component {
 
 class App extends Component {
   render() {
-    // return <ParamEditor render={paramsValues => <Model paramsValues={paramsValues} />} />
-    return <ParamEditor />
+    return <ParamEditor render={paramsValues => <Model paramsValues={paramsValues} />} />
+    //return <ParamEditor />
   }
 }
 ReactDOM.render(<App />, document.getElementById('root'))
