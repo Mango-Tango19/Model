@@ -35,18 +35,12 @@ class Param extends Component {
 
   onParamChange = e => {
     const param = e.target.value
-    this.setState({ param })
-    //console.log(this.state.param)
+    this.setState({ param }, this.props.addParam(this.state))
   }
 
   onIdChange = e => {
     const id = e.target.value
     this.setState({ id })
-    //console.log(this.state.id)
-  }
-
-  handleState = () => {
-    this.props.getParam(this.state)
   }
 
   render() {
@@ -54,6 +48,7 @@ class Param extends Component {
       <div>
         <input type="number" placeholder="enter ID" name="id" value={this.state.id} onChange={this.onIdChange} />
         <label htmlFor="id">Enter ID</label>
+        <br></br>
         <input
           type="text"
           placeholder="enter param"
@@ -62,7 +57,7 @@ class Param extends Component {
           onChange={this.onParamChange}
         />
         <label htmlFor="param">Enter Param</label>
-        <button onClick={this.handleState}>update Param</button>
+        <ParamValue id={this.state.id} addParamValues={this.props.addParamValues} />
       </div>
     )
   }
@@ -71,36 +66,56 @@ class Param extends Component {
 class ParamValue extends Component {
   state = {
     paramValue: '',
+    id: '',
   }
 
   onParamValueChange = e => {
     const paramValue = e.target.value
     this.setState({ paramValue })
+    this.setState({ id: this.props.id })
   }
 
-  handleState = () => {
-    this.props.getParamValue(this.state)
+  clearInput = () => {
+    this.setState({ paramValue: '' })
+    this.setState({ id: '' })
+  }
+
+  handleClick = () => {
+    this.props.addParamValues(this.state)
+    this.clearInput()
   }
 
   render() {
     return (
       <div>
         <input type="text" placeholder="enter paramValue" name="paramValue" onChange={this.onParamValueChange} />
-        <label htmlFor="paramValue">Enter Param</label>
-        <button onClick={this.handleState}>update ParamValue</button>
+        <label htmlFor="paramValue">Enter ParamValue</label> <br></br>
+        <button onClick={this.handleClick}>add Params</button>
+        <br></br>
       </div>
     )
   }
 }
 
 class Model extends Component {
-  renderParamValue = () => {
-    return this.props.paramsValues.map(item => {
-      return <span key={item.id}>{item.value}</span>
+  renderParamValue = arr => {
+    return arr.map(item => {
+      return (
+        <div>
+          <span key={item.id}>
+            paramId : {item.id}, value: {item.paramValue}
+          </span>
+        </div>
+      )
     })
   }
   render() {
-    return <div>{this.renderParamValue(this.props.paramsValues)}</div>
+    return (
+      <div>
+        <span>Model is</span>
+        <div>{this.renderParamValue(this.props.paramsValues)}</div>
+      </div>
+    )
   }
 }
 
@@ -108,28 +123,27 @@ class ParamEditor extends Component {
   state = {
     paramValue: [],
     param: [],
+    getModel: false,
   }
 
-  getParam = val => {
-    debugger
-    this.setState((state, val) => ({
-      param: [...state.param, val],
-    }))
-    console.log(this.state)
+  addParam = val => {
+    this.setState({ param: [...this.state.param, val] }, () => {})
   }
 
-  getParamValue = val => {
-    this.setState({
-      paramValue: val,
-    })
-    //console.log(this.state)
+  addParamValues = val => {
+    this.setState({ paramValue: [...this.state.paramValue, val] }, () => {})
   }
+
+  handleModel = () => {
+    this.setState({ getModel: true }, () => {})
+  }
+
   render() {
     return (
       <div>
-        <Param getParam={this.getParam} />
-        <ParamValue getParamValue={this.getParamValue} />
-        {this.props.render(this.state.paramValue)}
+        <Param addParam={this.addParam} addParamValues={this.addParamValues} />
+        <button onClick={this.handleModel}>Get Model</button>
+        {this.state.getModel ? this.props.render(this.state.paramValue) : null}
       </div>
     )
   }
@@ -138,7 +152,6 @@ class ParamEditor extends Component {
 class App extends Component {
   render() {
     return <ParamEditor render={paramsValues => <Model paramsValues={paramsValues} />} />
-    //return <ParamEditor />
   }
 }
 ReactDOM.render(<App />, document.getElementById('root'))
