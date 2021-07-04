@@ -8,7 +8,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 Решение необходимо оформить в виде одного файла со всеми компонентами и типами которые используются.
 
 
-### `interface Param {
+```js 
+interface Param {
    id: number;
    name: string;
    type: ‘string’;
@@ -29,4 +30,4 @@ class ParamEditor extends React.Component<Props, State> {
     public getModel(): Model {
     }
 }
-`
+```
