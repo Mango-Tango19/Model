@@ -1,32 +1,6 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
-// interface Param {
-//   id: number;
-//   name: string;
-//   type: ‘string’;
-// }
-// interface ParamValue {
-//    paramId: number;
-//    value: string;
-// }
-// interface Model {
-//    paramValues: ParamValue[];
-//    colors: Color[];
-// }
-// interface Props {
-//    params: Param[];
-//    model: Model;
-// }
-// class ParamEditor extends React.Component<Props, State> {
-//    public getModel(): Model {
-//    }
-// }
-
-// const getParam = (param: Param) {
-//   console.log(param.id);
-// }
-
 class Param extends Component {
   state = {
     id: '',
@@ -43,21 +17,27 @@ class Param extends Component {
     this.setState({ id })
   }
 
+  clearInput = () => {
+    this.setState({ param: '' })
+    this.setState({ id: '' })
+}
+
   render() {
     return (
-      <div>
-        <input type="number" placeholder="enter ID" name="id" value={this.state.id} onChange={this.onIdChange} />
-        <label htmlFor="id">Enter ID</label>
-        <br></br>
+        <div className="mb-3">
+          <label htmlFor="id" className="form-label" >ID</label>
+        <input type="number" className="form-control"  placeholder="any number" name="id" value={this.state.id} onChange={this.onIdChange} />
+          <label htmlFor="param" className="form-label">Param</label>
         <input
           type="text"
-          placeholder="enter param"
+          placeholder="param"
+          className="form-control"
           name="param"
           value={this.state.param}
           onChange={this.onParamChange}
         />
-        <label htmlFor="param">Enter Param</label>
-        <ParamValue id={this.state.id} addParamValues={this.props.addParamValues} />
+
+        <ParamValue id={this.state.id} addParamValues={this.props.addParamValues} clearInput={this.clearInput}/>
       </div>
     )
   }
@@ -78,6 +58,7 @@ class ParamValue extends Component {
   clearInput = () => {
     this.setState({ paramValue: '' })
     this.setState({ id: '' })
+    this.props.clearInput()
   }
 
   handleClick = () => {
@@ -87,11 +68,10 @@ class ParamValue extends Component {
 
   render() {
     return (
-      <div>
-        <input type="text" placeholder="enter paramValue" name="paramValue" onChange={this.onParamValueChange} />
-        <label htmlFor="paramValue">Enter ParamValue</label> <br></br>
-        <button onClick={this.handleClick}>add Params</button>
-        <br></br>
+        <div className="mb-3">
+          <label htmlFor="paramValue" className="form-label" >ParamValue</label>
+        <input type="text"  className="form-control" placeholder="paramValue" name="paramValue" onChange={this.onParamValueChange} value={this.state.paramValue}/>
+        <button onClick={this.handleClick}  className="btn btn-outline-success mt-3">add Params</button>
       </div>
     )
   }
@@ -101,19 +81,33 @@ class Model extends Component {
   renderParamValue = arr => {
     return arr.map(item => {
       return (
-        <div>
-          <span key={item.id}>
-            paramId : {item.id}, value: {item.paramValue}
-          </span>
-        </div>
+          <tr key={item.id}>
+          <td>
+             {item.id}
+          </td>
+            <td>
+               {item.paramValue}
+            </td>
+          </tr>
       )
     })
   }
   render() {
     return (
-      <div>
-        <span>Model is</span>
-        <div>{this.renderParamValue(this.props.paramsValues)}</div>
+      <div className="container p-3">
+        <h5>Model is</h5>
+        <table className="table">
+          <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">paramValue</th>
+          </tr>
+          </thead>
+          <tbody>
+          {this.renderParamValue(this.props.paramsValues)}
+          </tbody>
+        </table>
+
       </div>
     )
   }
@@ -140,9 +134,9 @@ class ParamEditor extends Component {
 
   render() {
     return (
-      <div>
+      <div className="container">
         <Param addParam={this.addParam} addParamValues={this.addParamValues} />
-        <button onClick={this.handleModel}>Get Model</button>
+        <button className="btn btn-outline-warning" onClick={this.handleModel}>Get Model</button>
         {this.state.getModel ? this.props.render(this.state.paramValue) : null}
       </div>
     )
